@@ -6,15 +6,14 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { useForm } from "react-hook-form";
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { FormGroup, Input } from '@mui/material';
+import Select from '@mui/material/Select';
+import {Input } from '@mui/material';
 
 const style = {
   position: 'absolute',
@@ -46,17 +45,39 @@ export default function Expenses({setData, expenseData}) {
   const rows = [];
   const names = {};
   const categories = ['Food', 'Travel', 'Equipment'];
-  let [name, setName] = React.useState('');
+  const [name, setName] = React.useState('');
   const [category, setCategory] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [cost, setCost] = React.useState();
   const [open, setOpen] = React.useState(false);
+  const [addOpen, setAddOpen] = React.useState(false);
   const [editRow, setEditRow] = React.useState();
   const handleOpen = (e, row) => {
     setOpen(true)
     setEditRow(row);
   };
   const handleClose = () => setOpen(false);
+  const handleAddOpen = () => setAddOpen(true);
+  const handleAddClose = () => setAddOpen(false);
+
+  //update component each time the general user data (from App.js) gets updated
+  React.useEffect(() => {
+    setExpenseInfo(expenseData)
+  }, [expenseData])
+
+  //creating a local component copy of the expense data
+  expenseInfo.forEach(user => {
+    const key = `${user.first_name} ${user.last_name}`.toString();
+    names[key] = user.id;
+    userExpenses[key] = [...user.expenses]
+  })
+
+  //populating the row data using the data from the local component copy
+  for(const [user, expenses] of Object.entries(userExpenses)){
+    for(const expense of expenses){
+      rows.push(createData(expense.expense_id, user, expense.category, expense.description, expense.cost))
+    }
+  }
 
   //general function to update expenses state
   const updateExpensesData = (name, newExpenses) => {
@@ -68,27 +89,48 @@ export default function Expenses({setData, expenseData}) {
     return expenseInfo.find(user => user.first_name === name[0] && user.last_name === name[1])
   }
 
+  const resetInputs = () => {
+    setCategory('');
+    setDescription('');
+    setCost('');
+    setName('');
+  }
+
+  //FUTURE TO-DO: need to refactor for using a unique id vs finding name since users can have same name
+  const handleAdd = () => {
+    //check if any inputs are empty
+    if(category.length > 0 && description.length > 0 && cost.length > 0){
+      let newExpense = filterExpenses(name.split(' '))
+      newExpense.expenses.push({expense_id: newExpense.expenses.length, category: category, description: description, cost: parseInt(cost)});
+  
+      updateExpensesData(name.split(' '), newExpense);
+      resetInputs();
+    } else {
+      alert('all field are required');
+    }
+    handleAddClose();
+  }
+
   //Currently, the functionality only allows to edit category, description, & cost.
-  //Future addition is to add the ability to change the name
+  //TODO: add the ability to edit the name
   const onSubmitEdit = () => {
     let nameSeparate = editRow?.full_name.split(' ');
     let expensesToChange = filterExpenses(nameSeparate);
-      let expense = expensesToChange.expenses.filter(expense => expense.category === editRow.category && expense.description === editRow.description && expense.cost === editRow.cost);
-      console.log(expense);
-      expense.category = category;
-      expense.description = description;
-      expense.cost = cost;
-      console.log("changed expense", expense);
-
-      let newExpense =  expensesToChange.expenses.map(exp => expense.expense_id === expense.expense_id ? expense: exp)
-
-      console.log(newExpense);
-      console.log(expensesToChange)
-      updateExpensesData(nameSeparate, expensesToChange);
-
+    const expense = expensesToChange.expenses.find(expense => expense.category === editRow.category && expense.description === editRow.description && expense.cost === editRow.cost);
+    const index = (expensesToChange.expenses.indexOf(expense))
+      if(index !== -1){
+        expensesToChange.expenses[index].category = category;
+        expensesToChange.expenses[index].description = description;
+        expensesToChange.expenses[index].cost = parseInt(cost);
+      }
+      if(category.length > 0 && description.length > 0 && cost.length > 0){
+        updateExpensesData(nameSeparate, expensesToChange);
+        resetInputs();
+      } else {
+        alert('all field are required');
+      }
     handleClose();
   }
-
 
   const handleDeleteRow = (e, row, id) => {;
     let nameSeparate = row.full_name.split(' ');
@@ -96,38 +138,90 @@ export default function Expenses({setData, expenseData}) {
     userToFilter.expenses = userToFilter.expenses.filter(expense => expense.expense_id !== id);
   
     updateExpensesData(nameSeparate, userToFilter)
-  
   }
 
-
-  const handleNameChange = (e, idx) => {
-    setName(e.target.value);
+  //add new expense modal
+  const addExpenseModal = () => {
+    return (
+      <Modal
+      open={addOpen}
+      onClose={handleAddClose}
+      aria-labelledby="add-expense-modal-title"
+      aria-describedby="add-expense- modal-description"
+    >
+      <Box sx={style}>
+        <FormControl fullWidth>
+          <InputLabel>Name</InputLabel>
+          <Select
+            value={name}
+            label="Name"
+            onChange={e => setName(e.target.value)}
+            required
+          >
+            {Object.keys(names).map((name, idx) => {return <MenuItem value={name}>{name}</MenuItem> })}
+          </Select>
+        </FormControl>
+        <FormControl fullWidth>
+          <InputLabel>Category</InputLabel>
+          <Select
+            value={category}
+            label="Name"
+            onChange={e => setCategory(e.target.value)}
+            required
+          >
+            {categories.map(category => {return <MenuItem value={category}>{category}</MenuItem> })}
+          </Select>
+        </FormControl>
+        <FormControl fullWidth>
+          <InputLabel>Description</InputLabel>
+          <Input id='desciption' type='text' onChange={e => setDescription(e.target.value)} required/>
+        </FormControl>
+        <FormControl fullWidth>
+          <InputLabel>Cost</InputLabel>
+          <Input id='cost' type='number' onChange={e => setCost(e.target.value)} required/>
+        </FormControl>
+        <Button onClick={handleAdd}>Add Expense</Button>
+      </Box>
+    </Modal>
+    )
   }
 
-  //FUTURE TO-DO: need to refactor for using a unique id vs finding name since users can have same name
-  const handleAdd = () => {
-    let newExpense = filterExpenses(name.split(' '))
-    newExpense.expenses.push({expense_id: newExpense.expenses.length, category: category, description: description, cost: parseInt(cost)});
-
-    updateExpensesData(name.split(' '), newExpense);
+  //edit expense modal
+  const editExpenseModal = () => {
+    return (
+      <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">Category</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  placeholder={editRow?.category}
+                  label="Name"
+                  onChange={e => setCategory(e.target.value)}
+                  required
+                >
+                  {categories.map(category => {return <MenuItem value={category}>{category}</MenuItem> })}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">Description</InputLabel>
+                <Input id='desciption' type='text' placeholder={editRow?.description} onChange={e => setDescription(e.target.value)} required/>
+              </FormControl>
+              <FormControl fullWidth>
+                <InputLabel id="demo-simple-select-label">Cost</InputLabel>
+                <Input id='cost' type='number' placeholder={editRow?.cost} onChange={e => setCost(e.target.value)} required/>
+              </FormControl>
+            <Button type='submit' onClick={onSubmitEdit}>Submit</Button>
+          </Box>
+        </Modal>  
+    )
   }
-
-
-  expenseInfo.forEach(user => {
-    const key = `${user.first_name} ${user.last_name}`.toString();
-    names[key] = user.id;
-    userExpenses[key] = [...user.expenses]
-  })
-
-  for(const [user, expenses] of Object.entries(userExpenses)){
-    for(const expense of expenses){
-      rows.push(createData(expense.expense_id, user, expense.category, expense.description, expense.cost))
-    }
-  }
-
-  React.useEffect(() => {
-    setExpenseInfo(expenseData)
-  }, [expenseData])
 
   return (
     <>
@@ -155,82 +249,16 @@ export default function Expenses({setData, expenseData}) {
             <TableCell align="right">{row.description}</TableCell>
             <TableCell align="right">${row.cost}</TableCell>
             <Button onClick={e => handleOpen(e, row)}>Edit</Button>
-              <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-                componentsProps={row}
-              >
-                <Box sx={style}>
-                    <FormControl fullWidth>
-                      <InputLabel id="demo-simple-select-label">Category</InputLabel>
-                      <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        placeholder={editRow?.category}
-                        label="Name"
-                        onChange={e => setCategory(e.target.value)}
-                        required
-                      >
-                        {categories.map(category => {return <MenuItem value={category}>{category}</MenuItem> })}
-                      </Select>
-                    </FormControl>
-                    <FormControl fullWidth>
-                      <InputLabel id="demo-simple-select-label">Description</InputLabel>
-                      <Input id='desciption' type='text' placeholder={editRow?.description} onChange={e => setDescription(e.target.value)} required/>
-                    </FormControl>
-                    <FormControl fullWidth>
-                      <InputLabel id="demo-simple-select-label">Cost</InputLabel>
-                      <Input id='cost' type='number' placeholder={editRow?.cost} onChange={e => setCost(e.target.value)} required/>
-                    </FormControl>
-                  <Button type='submit' onClick={onSubmitEdit}>Submit</Button>
-                </Box>
-              </Modal>
-            <button onClick={e => handleDeleteRow(e, row, row.expense_id)}>Delete</button>
+            {open ? editExpenseModal() : ''}
+            <Button onClick={e => handleDeleteRow(e, row, row.expense_id)}>Delete</Button>
           </TableRow>
         ))}
       </TableBody>
     </Table>
   </TableContainer>
-  Add Expense for User
-  <Box sx={{ minWidth: 120 }}>
-      <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Name</InputLabel>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={name}
-          label="Name"
-          onChange={e => handleNameChange(e)}
-          required
-        >
-          {Object.keys(names).map((name, idx) => {return <MenuItem value={name}>{name}</MenuItem> })}
-        </Select>
-      </FormControl>
-      <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Category</InputLabel>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          value={category}
-          label="Name"
-          onChange={e => setCategory(e.target.value)}
-          required
-        >
-          {categories.map(category => {return <MenuItem value={category}>{category}</MenuItem> })}
-        </Select>
-      </FormControl>
-      <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Description</InputLabel>
-        <Input id='desciption' type='text' onChange={e => setDescription(e.target.value)} required/>
-      </FormControl>
-      <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Cost</InputLabel>
-        <Input id='cost' type='number' onChange={e => setCost(e.target.value)} required/>
-      </FormControl>
-      <Button onClick={handleAdd}>Add Expense</Button>
-    </Box>
-  </>
+  <br/>
+    <Button onClick={handleAddOpen}>Add New Expense</Button>
+    {addOpen ? addExpenseModal() : ''}
+    </>
   )
 }
