@@ -37,17 +37,16 @@ export default function Users({setData, userData}) {
   const [userInfo, setUserInfo] = React.useState(userData);
   const [open, setOpen] = React.useState(false);
   const [editRow, setEditRow] = React.useState();
-  console.log(editRow);
   const handleOpen = (e, row) => {
     setOpen(true)
     setEditRow(row);
   };
   const handleClose = () => setOpen(false);
-  console.log(userInfo)
-  const {
-    register,
-    handleSubmit
-  } = useForm();
+  const {register,handleSubmit} = useForm();
+
+  React.useEffect(() => {
+    setUserInfo(userData)
+  }, [userData])
 
   const onSubmit = (data) => {
     setData(prevState => ([...prevState, {
@@ -62,23 +61,17 @@ export default function Users({setData, userData}) {
     const editedRow = userInfo.find(user => user.id === editRow?.id);
     editedRow.first_name = data.first_name;
     editedRow.last_name = data.last_name;
-    console.log(editedRow)
     const updatedUsers = (arr, obj) => arr && arr.map(user => user.id === editRow?.id ? editedRow : user);
     setData(updatedUsers);
     handleClose();
   }
 
-  console.log(userInfo)
   const getTotalExpenses = (expenses) => {
     const result = expenses.reduce((sum, {cost}) =>  sum + cost, 0)
     return result;
   }
   let rows = userInfo.map(user => createData(user.id, user.first_name, user.last_name, getTotalExpenses(user.expenses)));
   
-  React.useEffect(() => {
-    setUserInfo(userData)
-  }, [userData])
-
   const handleDelete = (e, id) => {
     const filteredData = userInfo.filter(user => user.id !== id);
     console.log(filteredData)

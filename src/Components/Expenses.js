@@ -52,43 +52,50 @@ export default function Expenses({setData, expenseData}) {
   const [cost, setCost] = React.useState();
   const [open, setOpen] = React.useState(false);
   const [editRow, setEditRow] = React.useState();
-  console.log(editRow);
   const handleOpen = (e, row) => {
     setOpen(true)
     setEditRow(row);
   };
   const handleClose = () => setOpen(false);
 
+  //general function to update expenses state
+  const updateExpensesData = (name, newExpenses) => {
+    const updatedExpenses = (arr, obj) => arr && arr.map(user => user.first_name === name[0] && user.last_name === name[1] ? newExpenses : user);
+    setData(updatedExpenses)
+  }
 
+  const filterExpenses = (name) => {
+    return expenseInfo.find(user => user.first_name === name[0] && user.last_name === name[1])
+  }
+
+  //Currently, the functionality only allows to edit category, description, & cost.
+  //Future addition is to add the ability to change the name
   const onSubmitEdit = () => {
-    console.log(editRow);
-    console.log(name);
     let nameSeparate = editRow?.full_name.split(' ');
-    console.log(nameSeparate);
-    if(name !== editRow?.name){
-      let oldExpense = expenseInfo.find(user => user.first_name === nameSeparate[0] && user.last_name === nameSeparate[1])
-      // let filteredExpenses = expenseInfo?.expenses.filter(expense => expense.category !== category && expense.description !== description && expense.cost !== cost);
-      // console.log(filteredExpenses, "filtered") 
-    }
-    
-    // console.log(nameSeparate);
-    // let newExpense = expenseInfo.find(user => user.first_name === nameSeparate[0] && user.last_name === nameSeparate[1])
-    // console.log(newExpense)
-    // newExpense.expenses.category = category;
-    // const updatedExpenses = (arr, obj) => arr && arr.map(user => user.first_name === nameSeparate[0] && user.last_name === nameSeparate[1] ? newExpense : user);
-    // setData(updatedExpenses);
+    let expensesToChange = filterExpenses(nameSeparate);
+      let expense = expensesToChange.expenses.filter(expense => expense.category === editRow.category && expense.description === editRow.description && expense.cost === editRow.cost);
+      console.log(expense);
+      expense.category = category;
+      expense.description = description;
+      expense.cost = cost;
+      console.log("changed expense", expense);
+
+      let newExpense =  expensesToChange.expenses.map(exp => expense.expense_id === expense.expense_id ? expense: exp)
+
+      console.log(newExpense);
+      console.log(expensesToChange)
+      updateExpensesData(nameSeparate, expensesToChange);
+
     handleClose();
   }
 
+
   const handleDeleteRow = (e, row, id) => {;
     let nameSeparate = row.full_name.split(' ');
-    let userToFilter = expenseInfo.find(user => user.first_name === nameSeparate[0] && user.last_name === nameSeparate[1])
+    let userToFilter = filterExpenses(nameSeparate)
     userToFilter.expenses = userToFilter.expenses.filter(expense => expense.expense_id !== id);
-    console.log(userToFilter);
-
-    const updatedExpenses = (arr, obj) => arr && arr.map(user => user.first_name === nameSeparate[0] && user.last_name === nameSeparate[1] ? userToFilter : user);
-
-    setData(updatedExpenses);
+  
+    updateExpensesData(nameSeparate, userToFilter)
   
   }
 
@@ -97,15 +104,12 @@ export default function Expenses({setData, expenseData}) {
     setName(e.target.value);
   }
 
-  //need to refactor for using a unique id vs finding name since users can have same name
+  //FUTURE TO-DO: need to refactor for using a unique id vs finding name since users can have same name
   const handleAdd = () => {
-    let nameSeparate = name.split(' ');
-    let newExpense = expenseInfo.find(user => user.first_name === nameSeparate[0] && user.last_name === nameSeparate[1])
+    let newExpense = filterExpenses(name.split(' '))
     newExpense.expenses.push({expense_id: newExpense.expenses.length, category: category, description: description, cost: parseInt(cost)});
-    const updatedExpenses = (arr, obj) => arr && arr.map(user => user.first_name === nameSeparate[0] && user.last_name === nameSeparate[1] ? newExpense : user);
-    console.log(updatedExpenses, "updated from here");
-    setData(updatedExpenses);
 
+    updateExpensesData(name.split(' '), newExpense);
   }
 
 
@@ -114,8 +118,6 @@ export default function Expenses({setData, expenseData}) {
     names[key] = user.id;
     userExpenses[key] = [...user.expenses]
   })
-  console.log(userExpenses)
-  console.log(names);
 
   for(const [user, expenses] of Object.entries(userExpenses)){
     for(const expense of expenses){
@@ -161,25 +163,12 @@ export default function Expenses({setData, expenseData}) {
                 componentsProps={row}
               >
                 <Box sx={style}>
-                <FormControl fullWidth>
-                      <InputLabel id="demo-simple-select-label">Name</InputLabel>
-                      <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={editRow?.name}
-                        label="Name"
-                        onChange={e => handleNameChange(e)}
-                        required
-                      >
-                        {Object.keys(names).map((name, idx) => {return <MenuItem value={name}>{name}</MenuItem> })}
-                      </Select>
-                    </FormControl>
                     <FormControl fullWidth>
                       <InputLabel id="demo-simple-select-label">Category</InputLabel>
                       <Select
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
-                        value={editRow?.category}
+                        placeholder={editRow?.category}
                         label="Name"
                         onChange={e => setCategory(e.target.value)}
                         required
@@ -189,11 +178,11 @@ export default function Expenses({setData, expenseData}) {
                     </FormControl>
                     <FormControl fullWidth>
                       <InputLabel id="demo-simple-select-label">Description</InputLabel>
-                      <Input id='desciption' type='text' value={editRow?.description} onChange={e => setDescription(e.target.value)} required/>
+                      <Input id='desciption' type='text' placeholder={editRow?.description} onChange={e => setDescription(e.target.value)} required/>
                     </FormControl>
                     <FormControl fullWidth>
                       <InputLabel id="demo-simple-select-label">Cost</InputLabel>
-                      <Input id='cost' type='number' value={editRow?.cost} onChange={e => setCost(e.target.value)} required/>
+                      <Input id='cost' type='number' placeholder={editRow?.cost} onChange={e => setCost(e.target.value)} required/>
                     </FormControl>
                   <Button type='submit' onClick={onSubmitEdit}>Submit</Button>
                 </Box>

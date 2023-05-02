@@ -21,21 +21,13 @@ export default function CompanyExpenses({setData, categoryData}) {
 
   categoryInfo.forEach(user => {
     user.expenses.forEach(expense => {
-      if(categories[expense.category]){
-        categories[expense.category].push(expense)
-      } else {
-        categories[expense.category] = [expense]
-      }
+      const category = categories[expense.category]
+      category ? categories[expense.category].push(expense) : categories[expense.category] = [expense]
     })
   })
-  console.log(categories)
 
   for(const [category, expenses] of Object.entries(categories)){
-    let total = 0;
-    for(const expense of expenses){
-      total += expense.cost;
-    }
-    console.log(total)
+    let total = expenses.reduce((sum, {cost}) => sum + cost, 0);
     rows.push(createData(category, total))
   }
 
