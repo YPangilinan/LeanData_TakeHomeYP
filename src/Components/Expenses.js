@@ -80,17 +80,15 @@ export default function Expenses({setData, expenseData}) {
     handleClose();
   }
 
-  const handleDeleteRow = (e, row, id) => {
-    console.log("this is the row", row);
+  const handleDeleteRow = (e, row, id) => {;
     let nameSeparate = row.full_name.split(' ');
     let userToFilter = expenseInfo.find(user => user.first_name === nameSeparate[0] && user.last_name === nameSeparate[1])
-    console.log('user.tofilter', userToFilter)
-    let filteredExpenses = userToFilter.expenses.filter(expense => expense.expense_id !== id);
+    userToFilter.expenses = userToFilter.expenses.filter(expense => expense.expense_id !== id);
+    console.log(userToFilter);
 
-    const updatedExpenses = (arr, obj) => arr && arr.map(user => user.first_name === nameSeparate[0] && user.last_name === nameSeparate[1] ? filteredExpenses : user);
+    const updatedExpenses = (arr, obj) => arr && arr.map(user => user.first_name === nameSeparate[0] && user.last_name === nameSeparate[1] ? userToFilter : user);
 
-    console.log(updatedExpenses)
-    // setData(filteredData);
+    setData(updatedExpenses);
   
   }
 
@@ -102,11 +100,10 @@ export default function Expenses({setData, expenseData}) {
   //need to refactor for using a unique id vs finding name since users can have same name
   const handleAdd = () => {
     let nameSeparate = name.split(' ');
-    console.log(nameSeparate);
     let newExpense = expenseInfo.find(user => user.first_name === nameSeparate[0] && user.last_name === nameSeparate[1])
-    console.log(newExpense)
     newExpense.expenses.push({expense_id: newExpense.expenses.length, category: category, description: description, cost: parseInt(cost)});
     const updatedExpenses = (arr, obj) => arr && arr.map(user => user.first_name === nameSeparate[0] && user.last_name === nameSeparate[1] ? newExpense : user);
+    console.log(updatedExpenses, "updated from here");
     setData(updatedExpenses);
 
   }
