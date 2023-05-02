@@ -12,12 +12,14 @@ const userData = [{
   last_name: "Smith",
   expenses: [
     {
-    category: "Essentials",
+    expense_id: 0,
+    category: "Equipment",
     description: "office supplies",
     cost: 200,
     },
     {
-      category: "Groceries",
+      expense_id: 1,
+      category: "Food",
       description: "snacks",
       cost: 50
     },
@@ -29,12 +31,14 @@ const userData = [{
   last_name: "Jones",
   expenses: [
     {
-    category: "Essentials",
+    expense_id: 0,
+    category: "Equipment",
     description: "Toilet paper",
     cost: 105
     },
     {
-      category: "Groceries",
+      expense_id: 1,
+      category: "Food",
       description: "ground meats",
       cost: 600
     },

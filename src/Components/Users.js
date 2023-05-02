@@ -58,6 +58,16 @@ export default function Users({setData, userData}) {
     }]))
   }
 
+  const onSubmitEdit = (data) => {
+    const editedRow = userInfo.find(user => user.id === editRow?.id);
+    editedRow.first_name = data.first_name;
+    editedRow.last_name = data.last_name;
+    console.log(editedRow)
+    const updatedUsers = (arr, obj) => arr && arr.map(user => user.id === editRow?.id ? editedRow : user);
+    setData(updatedUsers);
+    handleClose();
+  }
+
   console.log(userInfo)
   const getTotalExpenses = (expenses) => {
     const result = expenses.reduce((sum, {cost}) =>  sum + cost, 0)
@@ -108,10 +118,9 @@ export default function Users({setData, userData}) {
                 componentsProps={row}
               >
                 <Box sx={style}>
-                  {editRow.id}
-                <form onSubmit={handleSubmit(onSubmit)}>
-                  First Name: <input type='text' value={editRow.first_name} {...register('first_name')} />
-                  Last Name: <input type='text' value={editRow.last_name}{...register('last_name')} />
+                <form onSubmit={handleSubmit(onSubmitEdit)}>
+                  First Name: <input type='text' placeholder={editRow?.first_name} {...register('first_name')} required/>
+                  Last Name: <input type='text' placeholder={editRow?.last_name}{...register('last_name')} required/>
                   <input type="submit"/>
               </form>
                 </Box>
@@ -124,8 +133,8 @@ export default function Users({setData, userData}) {
   </TableContainer>
   Add User
   <form onSubmit={handleSubmit(onSubmit)}>
-    First Name: <input type='text' id="first-name" name="first-name" placeholder='John' {...register('first_name')} required/>
-    Last Name: <input type='text' id="last-name" name="last=name" placeholder='Smith'{...register('last_name')} required/>
+    First Name: <input type='text' id="first-name" name="first-name"  {...register('first_name')} placeholder='John' required/>
+    Last Name: <input type='text' id="last-name" name="last=name" {...register('last_name')} placeholder='Smith' required/>
     <input type="submit"/>
   </form>
   </>
