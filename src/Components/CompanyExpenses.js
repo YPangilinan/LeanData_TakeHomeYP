@@ -39,7 +39,7 @@ export default function CompanyExpenses({categoryData}) {
 
   return (
     <>
-    <div>Company Expenses</div>
+    <h3>Company Expenses</h3>
     <TableContainer component={Paper}>
     <Table sx={{ minWidth: 650 }}>
       <TableHead>

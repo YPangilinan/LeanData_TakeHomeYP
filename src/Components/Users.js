@@ -6,12 +6,9 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { useForm } from "react-hook-form";
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
-import FormControl from '@mui/material/FormControl';
-import { InputLabel, Input } from '@mui/material';
+import UserForm from './UserForm';
 
 const style = {
   position: 'absolute',
@@ -37,10 +34,10 @@ function createData(
 
 export default function Users({setData, userData}) {
   const [userInfo, setUserInfo] = React.useState(userData);
-  const [firstName, setFirstName] = React.useState('');
-  const [lastName, setLastName] = React.useState('');
   const [open, setOpen] = React.useState(false);
   const [editRow, setEditRow] = React.useState();
+  const [firstName, setFirstName] = React.useState('');
+  const [lastName, setLastName] = React.useState('');
   const handleOpen = (e, row) => {
     setOpen(true);
     setEditRow(row);
@@ -51,6 +48,15 @@ export default function Users({setData, userData}) {
   React.useEffect(() => {
     setUserInfo(userData)
   }, [userData])
+
+  //used for finding users total expenses needed for the total expenses column
+  const getTotalExpenses = (expenses) => {
+    const result = expenses.reduce((sum, {cost}) =>  sum + cost, 0)
+    return result;
+  }
+
+  //setting up the rows for the table
+  const rows = userInfo.map(user => createData(user.id, user.first_name, user.last_name, getTotalExpenses(user.expenses)));
 
   //add new user to userData on app.js then user info will get updated
   const onSubmit = () => {
@@ -79,25 +85,17 @@ export default function Users({setData, userData}) {
     handleClose();
   }
 
-  const resetInputs = () => {
-    setFirstName('');
-    setLastName('');
-  }
-
-  //used for finding users total expenses needed for the total expenses column
-  const getTotalExpenses = (expenses) => {
-    const result = expenses.reduce((sum, {cost}) =>  sum + cost, 0)
-    return result;
-  }
-
-  //setting up the rows for the table
-  const rows = userInfo.map(user => createData(user.id, user.first_name, user.last_name, getTotalExpenses(user.expenses)));
-  
   //deleting the row based on the user id
   const handleDelete = (id) => {
     const filteredData = userInfo.filter(user => user.id !== id);
     setData(filteredData);
   }
+  
+  const resetInputs = () => {
+    setFirstName('');
+    setLastName('');
+  }
+  
   return (
     <>
     <h3>Users</h3>
@@ -131,18 +129,7 @@ export default function Users({setData, userData}) {
                 aria-describedby="edit-user-description"
                 componentsProps={row}
               >
-                <Box sx={style}>
-                <h4>Edit User</h4>
-                  <FormControl fullWidth>
-                    <InputLabel >First Name</InputLabel>
-                    <Input id='first-name' type='text' placeholder={editRow?.first_name} onChange={e => setFirstName(e.target.value)} required/>
-                  </FormControl>
-                  <FormControl fullWidth>
-                    <InputLabel>Last Name</InputLabel>
-                    <Input id='last-name' type='text' placeholder={editRow?.last_name} onChange={e => setLastName(e.target.value)} required/>
-                  </FormControl>
-                  <Button onClick={onSubmitEdit}>Submit</Button>
-                </Box>
+                <UserForm title={'Edit User'} style={style} onChangeFirst={e => setFirstName(e.target.value)} onChangeSecond={e => setLastName(e.target.value)} onSubmit={onSubmitEdit} buttonValue={'Submit'}/>
               </Modal>
             <Button onClick={e => handleDelete(e, row.id)}>Delete</Button>
           </TableRow>
@@ -150,18 +137,7 @@ export default function Users({setData, userData}) {
       </TableBody>
     </Table>
   </TableContainer>
-  <h4>Add User</h4>
-      <Box>
-        <FormControl fullWidth>
-          <InputLabel >First Name</InputLabel>
-          <Input id='first-name' type='text' value={firstName} onChange={e => setFirstName(e.target.value)} required/>
-        </FormControl>
-        <FormControl fullWidth>
-          <InputLabel>Last Name</InputLabel>
-          <Input id='last-name' type='text' value={lastName} onChange={e => setLastName(e.target.value)} required/>
-        </FormControl>
-        <Button onClick={onSubmit}>Add User</Button>
-      </Box>
+  <UserForm title={'Add User'} firstValue={firstName} secondValue={lastName} onChangeFirst={e => setFirstName(e.target.value)} onChangeSecond={e => setLastName(e.target.value)} onSubmit={onSubmit} buttonValue={'Add New User'}/>
   </>
   )
 }

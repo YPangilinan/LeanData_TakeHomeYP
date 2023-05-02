@@ -41,9 +41,6 @@ function createData(
 
 export default function Expenses({setData, expenseData}) {
   const [expenseInfo, setExpenseInfo] = React.useState(expenseData);
-  const userExpenses = {};
-  const rows = [];
-  const names = {};
   const categories = ['Food', 'Travel', 'Equipment'];
   const [name, setName] = React.useState('');
   const [category, setCategory] = React.useState('');
@@ -52,13 +49,16 @@ export default function Expenses({setData, expenseData}) {
   const [open, setOpen] = React.useState(false);
   const [addOpen, setAddOpen] = React.useState(false);
   const [editRow, setEditRow] = React.useState();
+  const handleClose = () => setOpen(false);
+  const handleAddOpen = () => setAddOpen(true);
+  const handleAddClose = () => setAddOpen(false);
   const handleOpen = (e, row) => {
     setOpen(true)
     setEditRow(row);
   };
-  const handleClose = () => setOpen(false);
-  const handleAddOpen = () => setAddOpen(true);
-  const handleAddClose = () => setAddOpen(false);
+  const userExpenses = {};
+  const rows = [];
+  const names = {};
 
   //update component each time the general user data (from App.js) gets updated
   React.useEffect(() => {
@@ -225,7 +225,7 @@ export default function Expenses({setData, expenseData}) {
 
   return (
     <>
-    <div>Expenses</div>
+    <h3>Expenses</h3>
     <TableContainer component={Paper}>
     <Table sx={{ minWidth: 650 }} aria-label="simple table">
       <TableHead>
