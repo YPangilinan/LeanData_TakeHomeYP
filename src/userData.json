@@ -35,5 +35,18 @@
       "cost": 600
     }
 ]
+},
+{
+  "id": 2,
+  "first_name": "Jerry",
+  "last_name": "Brown",
+  "expenses": [
+    {
+    "expense_id": 0,
+    "category": "Travel",
+    "description": "Flight to San Diego",
+    "cost": 550
+    }
+]
 }
 ]

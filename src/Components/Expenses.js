@@ -77,9 +77,6 @@ export default function Expenses({setData, expenseData}) {
     return expenseInfo.find(user => user.first_name === name[0] && user.last_name === name[1])
   }
 
-  //if filtered on the same name, returns memoized result instead of re-filtering
-  const memoizedFilter = React.useMemo(() => filterExpenses(name));
-
   const resetInputs = () => {
     setCategory('');
     setDescription('');
@@ -91,7 +88,7 @@ export default function Expenses({setData, expenseData}) {
   const handleAdd = () => {
     //check if any inputs are empty
     if(category.length > 0 && description.length > 0 && cost.length > 0){
-      let newExpense = memoizedFilter(name.split(' '))
+      let newExpense = filterExpenses(name.split(' '))
       newExpense.expenses.push({expense_id: newExpense.expenses.length, category: category, description: description, cost: parseInt(cost)});
   
       updateExpensesData(name.split(' '), newExpense);
@@ -106,7 +103,7 @@ export default function Expenses({setData, expenseData}) {
   //TODO: add the ability to edit the name
   const onSubmitEdit = () => {
     let nameSeparate = editRow?.full_name.split(' ');
-    let expensesToChange = memoizedFilter(nameSeparate);
+    let expensesToChange = filterExpenses(nameSeparate);
     const expense = expensesToChange.expenses.find(expense => expense.category === editRow.category && expense.description === editRow.description && expense.cost === editRow.cost);
     const index = (expensesToChange.expenses.indexOf(expense))
       if(index !== -1){
@@ -125,7 +122,7 @@ export default function Expenses({setData, expenseData}) {
 
   const handleDeleteRow = (e, row, id) => {;
     let nameSeparate = row.full_name.split(' ');
-    let userToFilter = memoizedFilter(nameSeparate)
+    let userToFilter = filterExpenses(nameSeparate)
     userToFilter.expenses = userToFilter.expenses.filter(expense => expense.expense_id !== id);
   
     updateExpensesData(nameSeparate, userToFilter)
