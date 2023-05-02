@@ -1,70 +1,53 @@
-# Getting Started with Create React App
+# Take Home Project - Expenses Tables
+![Screen Shot 2023-05-02 at 12 02 17 PM](https://user-images.githubusercontent.com/61812035/235760989-5bd0c696-81ac-484d-8d1e-f4b85537cd9f.png)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Project Description
+This is a single page application containing 3 tables that allow you to add/edit/delete users, add/edit/delete expenses for each user, and display a summary of expenses by expense category.  <br>
 
-## Available Scripts
+## Want to run it locally?
+To install the application follow the instructions below:
 
-In the project directory, you can run:
+	git clone git@github.com:YPangilinan/LeanData_TakeHomeYP.git
+	npm install
+  
+This should install the necessary packages from the Package.JSON needed for the application. Then the terminal,run the React application with the command below.
 
-### `npm start`
+	npm start
+  
+The application will now be running locally on `localhost:3000`.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### How was this app created?
+The specific technologies used to create this app are:
+- [Create-React-App](https://github.com/facebook/create-react-app)
+- [MaterialUI](https://material-ui.com/)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
 
-### `npm test`
+## Features and Futures
+What are the functionalities for each table? What are some limitations to the features? And what are thoughts for future iterations of the project.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Users Table
 
-### `npm run build`
+**Functionality**
+- Add New User: This form takes a required first and last name and adds to the table of new users with a total expense of 0
+- Edit Existing User: This form takes required first and last name and updates the current user's first and last name
+- Delete User: This will delete your selected user from the table
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+**Future Improvements**
+- For editing a user, the inputs will be populated with selected user's first and last names allowing the user to have the ability to change just one name
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Expenses Table
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**Functionality**
+- Add New Expense: This form has a dropdown selection of existing users and categories as well as takes a description and cost adds to the table of expenses as well as adds to the expenses of the particular user selected
+- Edit Existing Expense: This form allows the user to edit the category, description, and cost of an existing expense for that selected user
+- Delete Expense: This will delete the selected expense from the selected user's expenses
 
-### `npm run eject`
+**Future Improvements**
+- For editing an expense, this user should be able to edit the user to which the expense was assigned.
+- The current implementation does not account for the duplicate names, though the userData has unique Id's assigned to each user
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Category Expenses Table
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+**Functionality**
+- Allows the user to view total expenses separated by expense category
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
