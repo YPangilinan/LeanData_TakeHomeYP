@@ -23,18 +23,16 @@ export default function CompanyExpenses({categoryData}) {
     setCategoryInfo(categoryData)
   }, [categoryData])
 
-  //creating a local copy of the category and expenses information 
+  //creating a local map of the category and total expenses information 
   categoryInfo.forEach(user => {
     user.expenses.forEach(expense => {
-      const category = categories[expense.category]
-      category ? category.push(expense) : categories[expense.category] = [expense]
+      categories[expense.category] ? categories[expense.category] += expense.cost : categories[expense.category] = expense.cost;
     })
   })
 
-  //find the total of each of the expenses and populate the row data
+  //find the populate the row data
   for(const [category, expenses] of Object.entries(categories)){
-    let total = expenses.reduce((sum, {cost}) => sum + cost, 0);
-    rows.push(createData(category, total))
+    rows.push(createData(category, expenses))
   }
 
   return (
