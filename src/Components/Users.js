@@ -46,8 +46,7 @@ export default function Users({setData, userData}) {
     setEditRow(row);
   };
   const handleClose = () => setOpen(false);
-  const {register,handleSubmit} = useForm();
-
+  
   //change component to re-render each time a new person is added
   React.useEffect(() => {
     setUserInfo(userData)

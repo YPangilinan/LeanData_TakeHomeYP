@@ -111,7 +111,7 @@ function App() {
           <Expenses expenseData={data} setData={setData}/>
           </TabPanel>
           <TabPanel value={value} index={2}>
-          <CompanyExpenses categoryData={data} setData={setData}/>
+          <CompanyExpenses categoryData={data}/>
           </TabPanel>
         </Box>
       </Container>

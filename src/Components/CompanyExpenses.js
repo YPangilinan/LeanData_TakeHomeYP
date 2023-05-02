@@ -14,32 +14,34 @@ function createData(
   return { category, total};
 }
 
-export default function CompanyExpenses({setData, categoryData}) {
+export default function CompanyExpenses({categoryData}) {
   const [categoryInfo, setCategoryInfo] = React.useState(categoryData)
   const categories = {};
   const rows = [];
-
-  categoryInfo.forEach(user => {
-    user.expenses.forEach(expense => {
-      const category = categories[expense.category]
-      category ? categories[expense.category].push(expense) : categories[expense.category] = [expense]
-    })
-  })
-
-  for(const [category, expenses] of Object.entries(categories)){
-    let total = expenses.reduce((sum, {cost}) => sum + cost, 0);
-    rows.push(createData(category, total))
-  }
 
   React.useEffect(() => {
     setCategoryInfo(categoryData)
   }, [categoryData])
 
+  //creating a local copy of the category and expenses information 
+  categoryInfo.forEach(user => {
+    user.expenses.forEach(expense => {
+      const category = categories[expense.category]
+      category ? category.push(expense) : categories[expense.category] = [expense]
+    })
+  })
+
+  //find the total of each of the expenses and populate the row data
+  for(const [category, expenses] of Object.entries(categories)){
+    let total = expenses.reduce((sum, {cost}) => sum + cost, 0);
+    rows.push(createData(category, total))
+  }
+
   return (
     <>
     <div>Company Expenses</div>
     <TableContainer component={Paper}>
-    <Table sx={{ minWidth: 650 }} aria-label="simple table">
+    <Table sx={{ minWidth: 650 }}>
       <TableHead>
         <TableRow>
           <TableCell>Category</TableCell>
